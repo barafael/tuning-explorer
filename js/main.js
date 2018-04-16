@@ -54,12 +54,14 @@ var pythagoreanIntervals = [
     { name: "Octave",          ratio  : 2.0},
 ];
 
+var inverseFreqCubed   = [ 1.0, 0.125, 0.037037037037037035, 0.015625, 0.008, 0.004629629629629629, 0.0029154518950437317, 0.001953125, 0.0013717421124828531, 0.001];
 var inverseFreqSquared = [ 0.63883, 0.1597075, 0.0709811111111111, 0.039926875, 0.0255532, 0.017745277777777776, 0.013037346938775509, 0.00998171875, 0.00788679012345679, 0.0063883];
 var inverseFreq        = [ 0.34142, 0.17071, 0.113806, 0.085355, 0.068284, 0.056903, 0.048774, 0.042677, 0.037935, 0.034142];
 var noImag = new Float32Array(10);
 
 var tuningSelector = document.getElementById("tuningselector");
 var synthSelector = document.getElementById("synthselector");
+synthSelector.value = "oneoverfcubed";
 
 var intervals = justIntervals;
 var num_intervals = intervals.length;
@@ -78,34 +80,7 @@ for (var i = 0; i < intervals.length; i++) {
     var oscillator = audio_context.createOscillator();
     var gain = audio_context.createGain();
 
-    var real = new Float32Array(10);
-    var imag = new Float32Array(10);
-
-    real[0] = 0.63883;
-    real[1] = 0.1597075;
-    real[2] = 0.0709811111111111;
-    real[3] = 0.039926875;
-    real[4] = 0.0255532;
-    real[5] = 0.017745277777777776;
-    real[6] = 0.013037346938775509;
-    real[7] = 0.00998171875;
-    real[8] = 0.00788679012345679;
-    real[9] = 0.0063883;
-
-/*
-    real[0] = 0.34142;
-    real[1] = 0.17071;
-    real[2] = 0.113806;
-    real[3] = 0.085355;
-    real[4] = 0.068284;
-    real[5] = 0.056903;
-    real[6] = 0.048774;
-    real[7] = 0.042677;
-    real[8] = 0.037935;
-    real[9] = 0.034142;
-*/
-
-    var wave = audio_context.createPeriodicWave(real, imag);
+    var wave = audio_context.createPeriodicWave(inverseFreqCubed, noImag);
     oscillator.setPeriodicWave(wave);
 
     oscillator.frequency.setValueAtTime(base_freq * intervals[i].ratio, audio_context.currentTime);
@@ -187,7 +162,6 @@ function updateSynth() {
             break;
         case "oneoverf":
             for (var i = 0; i < interval_oscillators.length; i++) {
-            
                 var wave = audio_context.createPeriodicWave(inverseFreq, noImag);
                 interval_oscillators[i].oscillator.setPeriodicWave(wave);
             }
@@ -195,8 +169,14 @@ function updateSynth() {
             break;
         case "oneoverfsquared":
             for (var i = 0; i < interval_oscillators.length; i++) {
-            
                 var wave = audio_context.createPeriodicWave(inverseFreqSquared, noImag);
+                interval_oscillators[i].oscillator.setPeriodicWave(wave);
+            }
+	    refresh_nodes();
+            break;
+        case "oneoverfcubed":
+            for (var i = 0; i < interval_oscillators.length; i++) {
+                var wave = audio_context.createPeriodicWave(inverseFreqCubed, noImag);
                 interval_oscillators[i].oscillator.setPeriodicWave(wave);
             }
 	    refresh_nodes();
