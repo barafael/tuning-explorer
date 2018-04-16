@@ -1,0 +1,66 @@
+<!doctype html>
+<html class="no-js" lang="">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>Tuning Explorer</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="manifest" href="site.webmanifest">
+    <link rel="apple-touch-icon" href="icon.png">
+    <!-- Place favicon.ico in the root directory -->
+
+    <link rel="stylesheet" href="css/normalize.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+<!--[if lte IE 9]>
+<p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="https://browsehappy.com/">upgrade
+    your browser</a> to improve your experience and security.</p>
+<![endif]-->
+
+<!-- Add your site or application content here -->
+<!--<p>Click on the buttons to the right to add harmonics.</p> -->
+<div class="grid-container">
+    <div class="controls" border="5px">
+        <button class="control_button" type="button" , onclick="togglePlaying()">SILENCE!!!</button>
+        <button class="control_button" type="button" , onclick="random_base_freq()">random frequency!</button>
+	<select id="tuningselector" onChange="updateTuning()" class="control_button">
+            <option value="just">Just</option>
+            <option value="pythagorean">Pythagorean</option>
+            <option value="equal">Equal</option>
+	</select>
+	<select id="synthselector" onChange="updateSynth()" class="control_button">
+            <option value="nosynth">No synth</option>
+            <option value="oneoverf">1 / f</option>
+            <option value="oneoverfsquared">1 / f^2</option>
+	</select>
+        <div class="slidecontainer">
+            <p>Base Frequency: <span id="freqLabel"></span></p>
+            <input type="range" min="40" max="1000" value="220" class="slider" id="frequency">
+        </div>
+    </div>
+    <div data-fundamental="0" class="fundamental_button">Root</div>
+    <div data-fundamental="1" class="fundamental_button">Minor Second</div>
+    <div data-fundamental="2" class="fundamental_button">Natural Second</div>
+    <div data-fundamental="3" class="fundamental_button">Minor Third</div>
+    <div data-fundamental="4" class="fundamental_button">Major Third</div>
+    <div data-fundamental="5" class="fundamental_button">Natural Fourth</div>
+    <div data-fundamental="6" class="fundamental_button">Augmented Fourth</div>
+    <div data-fundamental="7" class="fundamental_button">Diminished Fifth</div>
+    <div data-fundamental="8" class="fundamental_button">Natural Fifth</div>
+    <div data-fundamental="9" class="fundamental_button">Minor Sixth</div>
+    <div data-fundamental="10" class="fundamental_button">Major Sixth</div>
+    <div data-fundamental="11" class="fundamental_button">Minor Seventh</div>
+    <div data-fundamental="12" class="fundamental_button">Major Seventh</div>
+    <div data-fundamental="13" class="fundamental_button">Unison</div>
+</div>
+<script src="js/vendor/modernizr-3.5.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+<script>window.jQuery || document.write('<script src="js/vendor/jquery-3.2.1.min.js"><\/script>')</script>
+<script src="js/plugins.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
