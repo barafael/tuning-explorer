@@ -24,12 +24,13 @@
 <!--<p>Click on the buttons to the right to add harmonics.</p> -->
 <div class="grid-container">
     <div class="controls" border="5px">
-        <button class="control_button" type="button" , onclick="togglePlaying()">SILENCE!!!</button>
+        <button id="toggleMutedButton" class="control_button" type="button" , onclick="togglePlaying()">Playing</button>
         <button class="control_button" type="button" , onclick="random_base_freq()">random frequency!</button>
 	<select id="tuningselector" onChange="updateTuning()" class="control_button">
             <option value="just">Just</option>
             <option value="pythagorean">Pythagorean</option>
             <option value="equal">Equal</option>
+            <option value="ptolemaian">Ptolemaian</option>
 	</select>
 	<select id="synthselector" onChange="updateSynth()" class="control_button">
             <option value="nosynth">No synth</option>

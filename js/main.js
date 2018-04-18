@@ -54,6 +54,17 @@ var pythagoreanIntervals = [
     { name: "Octave",          ratio  : 2.0},
 ];
 
+var ptolemaianIntervals = [
+    { name: "Unison",          ratio  : 1.0/1.0},
+    { name: "MajorSecond",     ratio  : 9.0/8.0},
+    { name: "MajorThird",      ratio  : 5.0/4.0},
+    { name: "Fourth",          ratio  : 4.0/3.0},
+    { name: "Fifth",           ratio  : 3.0/2.0},
+    { name: "Sixth",           ratio  : 5.0/3.0},
+    { name: "MajorSeventh",    ratio  : 15.0/8.0},
+    { name: "Octave",          ratio  : 2.0},
+];
+
 var inverseFreqCubed   = [ 1.0, 0.125, 0.037037037037037035, 0.015625, 0.008, 0.004629629629629629, 0.0029154518950437317, 0.001953125, 0.0013717421124828531, 0.001];
 var inverseFreqSquared = [ 0.63883, 0.1597075, 0.0709811111111111, 0.039926875, 0.0255532, 0.017745277777777776, 0.013037346938775509, 0.00998171875, 0.00788679012345679, 0.0063883];
 var inverseFreq        = [ 0.34142, 0.17071, 0.113806, 0.085355, 0.068284, 0.056903, 0.048774, 0.042677, 0.037935, 0.034142];
@@ -64,9 +75,8 @@ var synthSelector = document.getElementById("synthselector");
 synthSelector.value = "oneoverfcubed";
 
 var intervals = justIntervals;
-var num_intervals = intervals.length;
 
-var mixer = audio_context.createChannelMerger(num_intervals);
+var mixer = audio_context.createChannelMerger(intervals.length);
 
 var pan = audio_context.createStereoPanner();
 pan.connect(audio_context.destination);
@@ -106,16 +116,23 @@ function set_base_frequency(freq) {
     refresh_nodes();
 }
 
-/* TODO extend to actually toggle */
+var muted = false;
 function togglePlaying() {
-    for (var i = 0; i < interval_oscillators.length; i++) {
-        interval_oscillators[i].gain.gain.setValueAtTime(0.0, audio_context.currentTime);
+    if (muted) {
+        muted = false;
+        refresh_nodes();
+    } else {
+        muted = true;
+        for (var i = 0; i < interval_oscillators.length; i++) {
+            interval_oscillators[i].gain.gain.setValueAtTime(0.0, audio_context.currentTime);
+        }
     }
+    var text = toggleMutedButton.firstChild;
+    text.data = text.data == "Muted" ? "Playing" : "Muted";
 }
 
 function refresh_nodes() {
     var division = 0.9 / active_fundamentals.length;
-
     for (var i = 0; i < interval_oscillators.length; i++) {
         if (active_fundamentals.includes(i)) {
             interval_oscillators[i].oscillator.frequency.setValueAtTime(base_freq * intervals[i].ratio, audio_context.currentTime);
@@ -138,6 +155,9 @@ function updateTuning() {
             break;
         case "equal":
             intervals = equalIntervals;
+            break;
+        case "ptolemaian":
+            intervals = ptolemaianIntervals;
             break;
     }
     refresh_nodes();
@@ -189,7 +209,7 @@ var active_fundamentals = [];
 
 $(".fundamental_button").click(function (e) {
     var fundamental = parseInt(e.currentTarget.dataset.fundamental);
-    if (fundamental < 0 || fundamental >= num_intervals) {
+    if (fundamental < 0 || fundamental >= intervals.length) {
         console.log("Unhandled fundamental index: " + fundamental);
         return;
     }
@@ -203,6 +223,8 @@ $(".fundamental_button").click(function (e) {
     }
     refresh_nodes();
 });
+
+var toggleMutedButton = document.getElementById("toggleMutedButton");
 
 var slider = document.getElementById("frequency");
 var output = document.getElementById("freqLabel");
