@@ -208,7 +208,7 @@ function updateSynth() {
 var active_fundamentals = [];
 
 $(".tonebutton").click(function (e) {
-    var fundamental = parseInt(e.currentTarget.dataset.fundamental);
+    var fundamental = parseInt(e.currentTarget.dataset.tonebutton);
     if (fundamental < 0 || fundamental >= intervals.length) {
         console.log("Unhandled fundamental index: " + fundamental);
         return;
