@@ -201,21 +201,10 @@ var slide_freq = function (freq) {
     set_base_frequency(freq);
 };
 
-
-
 function random_base_freq() {
-    var freq = base_freq;
-    var freq_step = Math.random() * (350 - 10) + 10;
+    var new_freq = Math.random() * (slider.max - slider.min) + slider.min;
 
-    if (freq - freq_step < slider.min) {
-        freq += freq_step;
-    } else if (freq + freq_step > slider.max) {
-        freq -= freq_step;
-    } else {
-        freq -= freq_step;
-    }
-
-    $({n: base_freq}).animate({n: freq}, {
+    $({n: base_freq}).animate({n: new_freq}, {
         duration: 128,
         step: function (now, fx) {
             set_base_frequency(now);
