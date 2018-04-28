@@ -99,8 +99,7 @@ body {
 
 .control_button {
     background-color: #545357;
-    border: 0.5px;
-    border-style: dotted;
+    border: 0.5px dotted;
     color: white;
     padding: 10px 24px;
     text-align: center;

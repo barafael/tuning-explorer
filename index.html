@@ -7,10 +7,6 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="manifest" href="site.webmanifest">
-    <link rel="apple-touch-icon" href="icon.png">
-    <!-- Place favicon.ico in the root directory -->
-
     <link rel="stylesheet" href="css/normalize.css">
     <link rel="stylesheet" href="css/main.css">
 </head>
@@ -23,10 +19,10 @@
 <!-- Add your site or application content here -->
 <!--<p>Click on the buttons to the right to add harmonics.</p> -->
 <div class="grid-container">
-    <div class="controls" border="5px">
-        <button id="toggleMutedButton" class="control_button" type="button" , onclick="togglePlaying()">Playing</button>
-        <button class="control_button" type="button" , onclick="random_base_freq()">random frequency!</button>
-	<select id="tuningselector" onChange="updateTuning()" class="control_button">
+    <div class="controls">
+        <button id="toggleMutedButton" class="control_button" type="button" onclick="togglePlaying()">Playing</button>
+        <button class="control_button" type="button" onclick="randomBaseFreq()">random frequency!</button>
+	<select id="tuningSelector" onChange="updateTuning()" class="control_button">
             <option value="just">Just</option>
             <option value="equal">Equal</option>
             <option value="pythagorean">Pythagorean</option>
@@ -34,9 +30,9 @@
     <div class="tooltip">Synthesizer Amplitude Decay Function
         <span class="tooltiptext">A synth note can be made up of overtones of increasing order. The amplitudes of overtones here decay with 1/f^p, where f is their order and p is the number in the field to the right. A higher number means that higher overtones are dampened stronger and less audible.</span>
     </div>
-        <input type="number" id="freq_pow" value="3" max="9" min="0" onchange="update_freq_pow(this.value)">
+        <input type="number" id="freq_pow" value="3" max="9" min="0" onchange="updateFreqPow(this.value)">
         <div class="slidecontainer">
-            <p>Base Frequency: <span id="freqLabel"></span></p>
+            <p>Base Frequency: <span id="freqLabel"></span>Hz</p>
             <input type="range" min="40" max="1000" value="220" class="slider" id="frequency">
         </div>
     </div>
