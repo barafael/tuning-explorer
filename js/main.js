@@ -21,18 +21,6 @@ let muted = false;
 
 const zeroPhase = new Float32Array(10);
 
-const spectrum = spectrumDecay((f) => 1.0 / (f * f * f));
-
-const mixer = audioContext.createChannelMerger(intervals.length);
-
-const pan = audioContext.createStereoPanner();
-pan.connect(audioContext.destination);
-pan.pan.setValueAtTime(0.5, audioContext.currentTime);
-
-mixer.connect(pan);
-
-let intervalOscillators = [];
-
 const justIntervals = [
     {name: "Unison", ratio: 1.0},
     {name: "MinorSecond", ratio: 16.0 / 15.0},
@@ -85,6 +73,18 @@ const pythagoreanIntervals = [
 ];
 
 let intervals = justIntervals;
+
+const spectrum = spectrumDecay((f) => 1.0 / (f * f * f));
+
+const mixer = audioContext.createChannelMerger(intervals.length);
+
+const pan = audioContext.createStereoPanner();
+pan.connect(audioContext.destination);
+pan.pan.setValueAtTime(0.5, audioContext.currentTime);
+
+mixer.connect(pan);
+
+let intervalOscillators = [];
 
 function spectrumDecay(fn) {
     "use strict";
