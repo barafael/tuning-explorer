@@ -54,20 +54,8 @@ var pythagoreanIntervals = [
     { name: "Octave",          ratio  : 2.0},
 ];
 
-var ptolemaianIntervals = [
-    { name: "Unison",          ratio  : 1.0/1.0},
-    { name: "MajorSecond",     ratio  : 9.0/8.0},
-    { name: "MajorThird",      ratio  : 5.0/4.0},
-    { name: "Fourth",          ratio  : 4.0/3.0},
-    { name: "Fifth",           ratio  : 3.0/2.0},
-    { name: "Sixth",           ratio  : 5.0/3.0},
-    { name: "MajorSeventh",    ratio  : 15.0/8.0},
-    { name: "Octave",          ratio  : 2.0},
-];
+var spectrum = spectrum_decay(f => 1.0/(f*f*f));
 
-var inverseFreqCubed   = spectrum_decay(f => 1.0/(f*f*f));
-var inverseFreqSquared = spectrum_decay(f => 1.0/(f*f));
-var inverseFreq        = spectrum_decay(f => 1.0/(f));
 var noImag = new Float32Array(10);
 
 function spectrum_decay(fn) {
@@ -78,12 +66,19 @@ function spectrum_decay(fn) {
     var sum = spectrum_arr.reduce((a, b) => a + b, 0);
     spectrum_arr = spectrum_arr.map((elem) => elem/sum);
     return new Float32Array(spectrum_arr);
+}
 
+function update_freq_pow(power) {
+    console.log("update!");
+    var amplitudes = spectrum_decay(f => 1.0/Math.pow(f, power));
+    for (var i = 0; i < interval_oscillators.length; i++) {
+        var wave = audio_context.createPeriodicWave(amplitudes, noImag);
+        interval_oscillators[i].oscillator.setPeriodicWave(wave);
+    }
+    refresh_nodes();
 }
 
 var tuningSelector = document.getElementById("tuningselector");
-var synthSelector = document.getElementById("synthselector");
-synthSelector.value = "oneoverfcubed";
 
 var intervals = justIntervals;
 
@@ -95,13 +90,12 @@ pan.pan.setValueAtTime(0.5, audio_context.currentTime);
 
 mixer.connect(pan);
 
-
 var interval_oscillators = [];
 for (var i = 0; i < intervals.length; i++) {
     var oscillator = audio_context.createOscillator();
     var gain = audio_context.createGain();
 
-    var wave = audio_context.createPeriodicWave(inverseFreqCubed, noImag);
+    var wave = audio_context.createPeriodicWave(spectrum, noImag);
     oscillator.setPeriodicWave(wave);
 
     oscillator.frequency.setValueAtTime(base_freq * intervals[i].ratio, audio_context.currentTime);
@@ -161,56 +155,11 @@ function updateTuning() {
         case "just":
             intervals = justIntervals;
             break;
-        case "pythagorean":
-            intervals = pythagoreanIntervals;
-            break;
         case "equal":
             intervals = equalIntervals;
             break;
-        case "ptolemaian":
-            intervals = ptolemaianIntervals;
-            break;
-    }
-    refresh_nodes();
-}
-
-function updateSynth() {
-    switch (synthSelector.value) {
-        case "nosynth":
-            for (var i = 0; i < interval_oscillators.length; i++) {
-                var real = new Float32Array(2);
-                var imag = new Float32Array(2);
-
-		real[0] = 0;
-		imag[0] = 0;
-		real[1] = 1;
-		imag[1] = 0;
-            
-                var wave = audio_context.createPeriodicWave(real, imag);
-                interval_oscillators[i].oscillator.setPeriodicWave(wave);
-            }
-	    refresh_nodes();
-            break;
-        case "oneoverf":
-            for (var i = 0; i < interval_oscillators.length; i++) {
-                var wave = audio_context.createPeriodicWave(inverseFreq, noImag);
-                interval_oscillators[i].oscillator.setPeriodicWave(wave);
-            }
-	    refresh_nodes();
-            break;
-        case "oneoverfsquared":
-            for (var i = 0; i < interval_oscillators.length; i++) {
-                var wave = audio_context.createPeriodicWave(inverseFreqSquared, noImag);
-                interval_oscillators[i].oscillator.setPeriodicWave(wave);
-            }
-	    refresh_nodes();
-            break;
-        case "oneoverfcubed":
-            for (var i = 0; i < interval_oscillators.length; i++) {
-                var wave = audio_context.createPeriodicWave(inverseFreqCubed, noImag);
-                interval_oscillators[i].oscillator.setPeriodicWave(wave);
-            }
-	    refresh_nodes();
+        case "pythagorean":
+            intervals = pythagoreanIntervals;
             break;
     }
     refresh_nodes();
