@@ -65,10 +65,21 @@ var ptolemaianIntervals = [
     { name: "Octave",          ratio  : 2.0},
 ];
 
-var inverseFreqCubed   = new Float32Array([ 1.0, 0.125, 0.037037037037037035, 0.015625, 0.008, 0.004629629629629629, 0.0029154518950437317, 0.001953125, 0.0013717421124828531, 0.001]);
-var inverseFreqSquared = new Float32Array([ 0.63883, 0.1597075, 0.0709811111111111, 0.039926875, 0.0255532, 0.017745277777777776, 0.013037346938775509, 0.00998171875, 0.00788679012345679, 0.0063883]);
-var inverseFreq        = new Float32Array([ 0.34142, 0.17071, 0.113806, 0.085355, 0.068284, 0.056903, 0.048774, 0.042677, 0.037935, 0.034142]);
+var inverseFreqCubed   = spectrum_decay(f => 1.0/(f*f*f));
+var inverseFreqSquared = spectrum_decay(f => 1.0/(f*f));
+var inverseFreq        = spectrum_decay(f => 1.0/(f));
 var noImag = new Float32Array(10);
+
+function spectrum_decay(fn) {
+    var spectrum_arr = Array(10).fill(0);
+    spectrum_arr.forEach(function(elem, index) {
+        spectrum_arr[index] = fn(index + 1);
+    });
+    var sum = spectrum_arr.reduce((a, b) => a + b, 0);
+    spectrum_arr = spectrum_arr.map((elem) => elem/sum);
+    return new Float32Array(spectrum_arr);
+
+}
 
 var tuningSelector = document.getElementById("tuningselector");
 var synthSelector = document.getElementById("synthselector");
