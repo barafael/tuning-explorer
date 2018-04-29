@@ -65,7 +65,7 @@ window.onload = function() {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
     audioContext = new AudioContextClass({
         latencyHint: "interactive",
-        sampleRate: 44100
+        sampleRate: 11025
     });
 
     const mixer = audioContext.createChannelMerger(intervals.length);
