@@ -1,26 +1,5 @@
 let baseFreq = 220;
 
-const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-
-const audioContext = new AudioContextClass({
-    latencyHint: "interactive",
-    sampleRate: 44100
-});
-
-let activeFundamentals = [];
-
-const tuningSelector = document.getElementById("tuningSelector");
-
-const toggleMutedButton = document.getElementById("toggleMutedButton");
-
-let outputFreqLabel = document.getElementById("freqLabel");
-const slider = document.getElementById("frequency");
-outputFreqLabel.innerHTML = slider.value;
-
-let muted = false;
-
-const zeroPhase = new Float32Array(10);
-
 const justIntervals = [
     {name: "Unison", ratio: 1.0},
     {name: "MinorSecond", ratio: 16.0 / 15.0},
@@ -74,17 +53,68 @@ const pythagoreanIntervals = [
 
 let intervals = justIntervals;
 
+let intervalOscillators = [];
+
+const zeroPhase = new Float32Array(10);
+
 const spectrum = spectrumDecay((f) => 1.0 / (f * f * f));
 
-const mixer = audioContext.createChannelMerger(intervals.length);
+let audioContext = undefined;
 
-const pan = audioContext.createStereoPanner();
-pan.connect(audioContext.destination);
-pan.pan.setValueAtTime(0.5, audioContext.currentTime);
+window.onload = function() {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    audioContext = new AudioContextClass({
+        latencyHint: "interactive",
+        sampleRate: 44100
+    });
 
-mixer.connect(pan);
+    const mixer = audioContext.createChannelMerger(intervals.length);
 
-let intervalOscillators = [];
+    const pan = audioContext.createStereoPanner();
+    pan.connect(audioContext.destination);
+    pan.pan.setValueAtTime(0.5, audioContext.currentTime);
+
+    mixer.connect(pan);
+
+    for (let i = 0; i < intervals.length; i++) {
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        const wave = audioContext.createPeriodicWave(spectrum, zeroPhase);
+        oscillator.setPeriodicWave(wave);
+
+        oscillator.frequency.setValueAtTime(baseFreq * intervals[i].ratio, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.0, audioContext.currentTime);
+
+        oscillator.connect(gain);
+        gain.connect(mixer);
+
+        intervalOscillators.push(
+            {
+                key: intervals[i].key,
+                oscillator: oscillator,
+                gain: gain,
+            }
+        );
+        oscillator.start();
+    }
+    audioContext.resume().then(() => {
+        console.log('Playback resumed successfully');
+    });
+}
+
+let activeFundamentals = [];
+
+const tuningSelector = document.getElementById("tuningSelector");
+
+const toggleMutedButton = document.getElementById("toggleMutedButton");
+
+let outputFreqLabel = document.getElementById("freqLabel");
+const slider = document.getElementById("frequency");
+outputFreqLabel.innerHTML = slider.value;
+
+let muted = false;
+
 
 function spectrumDecay(fn) {
     "use strict";
@@ -121,29 +151,6 @@ function updateFreqPow(power) {
     refreshNodes();
 }
 
-
-for (let i = 0; i < intervals.length; i++) {
-    const oscillator = audioContext.createOscillator();
-    const gain = audioContext.createGain();
-
-    const wave = audioContext.createPeriodicWave(spectrum, zeroPhase);
-    oscillator.setPeriodicWave(wave);
-
-    oscillator.frequency.setValueAtTime(baseFreq * intervals[i].ratio, audioContext.currentTime);
-    gain.gain.setValueAtTime(0.0, audioContext.currentTime);
-
-    oscillator.connect(gain);
-    gain.connect(mixer);
-
-    intervalOscillators.push(
-        {
-            key: intervals[i].key,
-            oscillator: oscillator,
-            gain: gain,
-        }
-    );
-    oscillator.start();
-}
 
 function setBaseFrequency(freq) {
     "use strict";
