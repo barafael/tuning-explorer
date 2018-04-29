@@ -57,7 +57,7 @@ let intervalOscillators = [];
 
 const zeroPhase = new Float32Array(10);
 
-const spectrum = spectrumDecay((f) => 1.0 / (f * f * f));
+const spectrum = spectrumDecay((f) => 1.0 / (f * f * f * f * f * f));
 
 let audioContext = undefined;
 
