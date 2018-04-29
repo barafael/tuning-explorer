@@ -98,9 +98,7 @@ window.onload = function() {
         );
         oscillator.start();
     }
-    audioContext.resume().then(() => {
-        console.log('Playback resumed successfully');
-    });
+    audioContext.resume();
 }
 
 let activeFundamentals = [];
