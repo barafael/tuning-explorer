@@ -202,6 +202,7 @@ $(".tonebutton").click(function (e) {
         $(this).css("opacity", 1.0);
         activeFundamentals.push(fundamental);
     }
+    audioContext.resume();
     refreshNodes();
 });
 
