@@ -96,6 +96,7 @@ const zeroPhase = new Float32Array(10);
 const spectrum = spectrumDecay((f) => 1.0 / (f * f * f * f * f * f));
 
 let audioContext = undefined;
+let analyser = undefined;
 
 window.onload = function() {
     const AudioContextClass = window.AudioContext || window.webkitAudioContext;
@@ -103,6 +104,8 @@ window.onload = function() {
         latencyHint: "interactive",
         sampleRate: 11025
     });
+
+    analyser = audioContext.createAnalyser();
 
     const mixer = audioContext.createChannelMerger(intervals.length);
 
@@ -133,6 +136,7 @@ window.onload = function() {
             }
         );
         oscillator.start();
+        mixer.connect(analyser);
     }
     audioContext.resume();
 }
@@ -149,6 +153,9 @@ outputFreqLabel.innerHTML = slider.value;
 
 let muted = false;
 
+let canvasCtx = document.getElementById("wave").getContext("2d");
+
+let canvas2Ctx = document.getElementById("spectrum").getContext("2d");
 
 function spectrumDecay(fn) {
     "use strict";
@@ -173,6 +180,69 @@ function refreshNodes() {
                 .setValueAtTime(0.0, audioContext.currentTime);
         }
     }
+    var bufferLength = analyser.frequencyBinCount;
+    var dataArray = new Uint8Array(bufferLength);
+    analyser.getByteTimeDomainData(dataArray);
+    canvasCtx.clearRect(0, 0, 200, 100);
+    var draw = function() {
+        drawVisual = requestAnimationFrame(draw);
+        analyser.getByteTimeDomainData(dataArray);
+        canvasCtx.fillStyle = 'rgb(200, 200, 200)';
+        canvasCtx.fillRect(0, 0, 200, 100);
+        canvasCtx.lineWidth = 2;
+        canvasCtx.strokeStyle = 'rgb(0, 0, 0)';
+        canvasCtx.beginPath();
+        var sliceWidth = 200 * 1.0 / bufferLength;
+        var x = 0;
+
+        for(var i = 0; i < bufferLength; i++) {
+            var v = dataArray[i] / 128.0;
+            var y = v * 100/2;
+
+            if(i === 0) {
+                canvasCtx.moveTo(x, y);
+            } else {
+                canvasCtx.lineTo(x, y);
+            }
+            x += sliceWidth;
+        }
+        canvasCtx.lineTo(canvas.width, canvas.height/2);
+        canvasCtx.stroke();
+      };
+
+      draw();
+
+    const WIDTH = 200;
+    const HEIGHT = 100;
+      var bufferLengthAlt = analyser.frequencyBinCount;
+      console.log(bufferLengthAlt);
+      var dataArrayAlt = new Uint8Array(bufferLengthAlt);
+
+      canvas2Ctx.clearRect(0, 0, WIDTH, HEIGHT);
+
+      var drawAlt = function() {
+        drawVisual = requestAnimationFrame(drawAlt);
+
+        analyser.getByteFrequencyData(dataArrayAlt);
+
+        canvas2Ctx.fillStyle = 'rgb(0, 0, 0)';
+        canvas2Ctx.fillRect(0, 0, WIDTH, HEIGHT);
+
+        var barWidth = (WIDTH / bufferLengthAlt) * 2.5;
+        var barHeight;
+        var x = 0;
+
+        for(var i = 0; i < bufferLengthAlt; i++) {
+          barHeight = dataArrayAlt[i];
+
+          canvas2Ctx.fillStyle = 'rgb(' + (barHeight+100) + ',50,50)';
+          canvas2Ctx.fillRect(x,HEIGHT-barHeight/2,barWidth,barHeight/2);
+
+          x += barWidth + 1;
+        }
+      };
+
+      drawAlt();
 }
 
 function updateFreqPow(power) {
